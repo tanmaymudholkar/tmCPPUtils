@@ -67,58 +67,12 @@ std::vector<std::string> getListOfROOTBranches(const std::string& inputFilePath)
   return listOfROOTBranches;
 }
 
-void checkArguments(const std::map<std::string, std::string>& inputArguments, const std::vector<std::string>& expectedArguments) {
-  for (auto expectedArgumentsIterator = expectedArguments.begin(); expectedArgumentsIterator != expectedArguments.end(); ++expectedArgumentsIterator) {
-    if (inputArguments.find(*expectedArgumentsIterator) == inputArguments.end()) {
-      std::cout << "ERROR: argument \"" << *expectedArgumentsIterator << "\" expected but not found in list of input arguments" << std::endl;
-      std::cout << "Provided arguments: " << std::endl;
-      for (auto inputArgumentsIterator = inputArguments.begin(); inputArgumentsIterator != inputArguments.end(); ++inputArgumentsIterator) {
-        std::cout << "inputArguments[\"" << inputArgumentsIterator->first << "\"]: \"" << inputArgumentsIterator->second << "\"" << std::endl;
-      }
-      std::exit(EXIT_FAILURE);
-    }
-  }
-}
-
-std::map<std::string, std::string> parseArguments(int argc, char *argv[]) {
-  std::map<std::string, std::string> inputArguments;
-  if (argc != 3) {
-    std::cout << "ERROR: Expected exactly 2 arguments: \"input\", the path to the input file, and \"output\", the name path to the output file." << std::endl
-              << "Syntax: listROOTBranches input=<input path> output=<output path>" << std::endl
-              << "Currently passed arguments: " << std::endl;
-    for (int argCounter = 1; argCounter < argc; ++argCounter) {
-      std::cout << "arg[" << argCounter << "] = " << argv[argCounter] << std::endl;
-    }
-    std::exit(EXIT_FAILURE);
-  }
-  for (int argCounter = 1; argCounter < argc; ++argCounter) {
-    std::string argument = argv[argCounter];
-    std::smatch regexMatch;
-    if (std::regex_match(argument, regexMatch, std::regex("^([^=]+)=([^=]+)$"))) {
-      if (!(regexMatch.size() == 3)) {
-        std::cout << "ERROR in parsing supplied argument (" << argument << ") as arg=value." << std::endl;
-        std::cout << "regex matches: " << std::endl;
-        for (unsigned regexMatchCounter = 1; regexMatchCounter < regexMatch.size(); ++regexMatchCounter) {
-          std::cout << "regexMatch[" << regexMatchCounter << "]: " << regexMatch[regexMatchCounter] << std::endl;
-        }
-        std::exit(EXIT_FAILURE);
-      }
-      std::cout << "Setting: inputArguments[\"" << regexMatch[1] << "\"] = \"" << regexMatch[2] << "\"" << std::endl;
-      inputArguments[regexMatch[1]] = regexMatch[2];
-    }
-    else{
-      std::cout << "ERROR: Argument " << argCounter << " not in the format arg=val; passed argument = " << argument << std::endl;
-      std::exit(EXIT_FAILURE);
-    }
-  }
-  return inputArguments;
-}
-
 int main(int argc, char *argv[]) {
-  std::map<std::string, std::string> inputArguments = parseArguments(argc, argv);
-  std::vector<std::string> expectedArguments = {"input", "output"};
-  checkArguments(inputArguments, expectedArguments);
-  std::vector<std::string> listOfROOTBranches = getListOfROOTBranches(inputArguments["input"]);
-  writeVectorToFile(listOfROOTBranches, inputArguments["output"]);
+  tmArgumentParser argumentParser = tmArgumentParser("Recursively enters all possible TDirectories starting from / of a given ROOT file, gets list of all available ROOT branches, and writes them to an output file.");
+  argumentParser.addArgument("input", "", true, "Full path to input file.");
+  argumentParser.addArgument("output", "", true, "Full path to output file.");
+  argumentParser.setPassedStringValues(argc, argv);
+  std::vector<std::string> listOfROOTBranches = getListOfROOTBranches(argumentParser.getArgumentString("input"));
+  writeVectorToFile(listOfROOTBranches, argumentParser.getArgumentString("output"));
   return 0;
 }

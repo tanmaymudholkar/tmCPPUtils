@@ -1,7 +1,12 @@
 # Remember: order of arguments to g++ is important, the `root-config` must follow the rest of the arguments
 
 listROOTBranches: main.o
-	g++ -o bin/listROOTBranches obj/main.o `root-config --cflags --glibs`
+	g++ -o bin/listROOTBranches obj/main.o -L../argumentParser/lib -ltmArgumentParser `root-config --cflags --glibs`
 
 main.o: src/main.cpp include/main.h
-	g++ -Wall -Wextra -Werror -pedantic -std=c++11 -c -o obj/main.o src/main.cpp `root-config --cflags --glibs`
+	g++ -c -Wall -Wextra -Werror -pedantic -std=c++11 -fPIC -O3 -o obj/main.o src/main.cpp -I../argumentParser/include `root-config --cflags --glibs`
+
+clean:
+	rm -rf bin/*
+	rm -rf obj/*
+	rm -rf lib/*
