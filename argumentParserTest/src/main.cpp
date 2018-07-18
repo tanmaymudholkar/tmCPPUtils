@@ -13,7 +13,6 @@ int main(int argc, char** argv) {
   argumentParser.addArgument("double_default", "3.1415926", false, "double default.");
   argumentParser.setPassedStringValues(argc, argv);
   
-
   std::string stringRequired = argumentParser.getArgumentString("string_required");
   std::string stringDefault = argumentParser.getArgumentString("string_default");
   std::cout << "stringRequired = " << stringRequired
