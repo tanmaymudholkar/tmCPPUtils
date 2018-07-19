@@ -11,6 +11,6 @@ if [ -d "${1}" ]; then
 fi
 
 mkdir ${1} && rsync --progress -av template/ ${1}/
-sed -i.bak "s|bin/helloWorld|bin/${1}|" ${1}/Makefile && rm ${1}/Makefile.bak
+sed -i.bak "s|helloWorld|${1}|" ${1}/Makefile && rm ${1}/Makefile.bak
 
 set +x
