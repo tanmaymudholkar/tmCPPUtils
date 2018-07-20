@@ -3,6 +3,8 @@
 int main(int argc, char* argv[]) {
   std::cout << "Hello world!" << std::endl;
 
+  std::cout << "Current directory is: " << tmMiscUtils::getCWD() << std::endl;
+
   std::cout << "Constructing example argument parser..." << std::endl;
   tmArgumentParser argumentParser = tmArgumentParser("Template parser.");
   argumentParser.addArgument("arg", "defaultValue", false, "argument example.");
