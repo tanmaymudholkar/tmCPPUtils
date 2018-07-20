@@ -1,3 +1,6 @@
+#ifndef TMARGUMENTPARSER_H
+#define TMARGUMENTPARSER_H
+
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
@@ -26,3 +29,5 @@ class tmArgumentParser {
 
   std::string getArgumentString(std::string argumentName);
 };
+
+#endif

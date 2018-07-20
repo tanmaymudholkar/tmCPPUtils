@@ -1,3 +1,6 @@
+#ifndef TMROOTSAVERUTILS_H
+#define TMROOTSAVERUTILS_H
+
 #include <cstdlib>
 #include <iostream>
 
@@ -23,3 +26,5 @@ namespace tmROOTSaverUtils {
               << ", class = " << object->ClassName() << std::endl;
   }
 }
+
+#endif

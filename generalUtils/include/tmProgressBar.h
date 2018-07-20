@@ -1,3 +1,6 @@
+#ifndef TMPROGRESSBAR_H
+#define TMPROGRESSBAR_H
+
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
@@ -23,3 +26,5 @@ class tmProgressBar {
   void initialize();
   void updateBar(double fractionCompleted, int counterCurrentValue = 0);
 };
+
+#endif
