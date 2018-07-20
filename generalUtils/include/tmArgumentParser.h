@@ -22,7 +22,7 @@ class tmArgumentParser {
 
  public:
   tmArgumentParser(std::string programDescription);
-  ~tmArgumentParser(){};
+  ~tmArgumentParser();
   void addArgument(std::string argumentName, std::string defaultValueString, bool isRequired, std::string description);
 
   void setPassedStringValues(int argc, char** argv);

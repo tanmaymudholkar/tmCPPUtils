@@ -63,3 +63,15 @@ TCanvas* tmROOTSaverUtils::saveObjects(TObjArray *objectArray, std::string canva
   if (writeToFile) outputFile->WriteTObject(canvas);
   return canvas;
 }
+
+TCanvas* tmROOTSaverUtils::saveSingleObject(TObject *object, std::string canvasName, TFile* outputFile, std::string outputDocumentName, int canvas_xPixels, int canvas_yPixels, int customOptStat, std::string customPaintTextFormat, std::string customPlotOptions, bool enableLogX, bool enableLogY, bool enableLogZ, double customXRangeLow, double customXRangeHigh, double customYRangeLow, double customYRangeHigh, double customZRangeLow, double customZRangeHigh) {
+  TObjArray *singleObjectArray = new TObjArray(1);
+  singleObjectArray->Add(object);
+  return saveObjects(singleObjectArray, canvasName, outputFile, outputDocumentName, canvas_xPixels, canvas_yPixels, customOptStat, customPaintTextFormat, customPlotOptions, enableLogX, enableLogY, enableLogZ, customXRangeLow, customXRangeHigh, customYRangeLow, customYRangeHigh, customZRangeLow, customZRangeHigh);
+}
+
+void tmROOTSaverUtils::printObjectInfo(TObject* object) {
+  std::cout << "Object info: name = " << object->GetName()
+            << ", title = " << object->GetTitle()
+            << ", class = " << object->ClassName() << std::endl;
+}

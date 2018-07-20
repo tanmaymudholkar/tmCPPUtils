@@ -4,6 +4,8 @@ tmArgumentParser::tmArgumentParser(std::string programDescription) {
   programDescription_ = programDescription;
 }
 
+tmArgumentParser::~tmArgumentParser() {}
+
 void tmArgumentParser::addArgument(std::string argumentName, std::string defaultValueString, bool isRequired, std::string description) {
   argumentCharacteristicsStruct temp;
   temp.defaultValueString_ = defaultValueString;
