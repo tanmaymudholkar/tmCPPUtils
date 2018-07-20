@@ -16,4 +16,3 @@ main.o: main.cpp main.h
 clean:
 	rm -rf bin/*
 	rm -rf obj/*
-	rm -rf lib/*
