@@ -30,5 +30,11 @@ int main(int argc, char* argv[]) {
     progressBar->updateBar(fractionCompleted, testCounter);
   }
   delete progressBar;
+
+  TH1F *testHistogram = new TH1F("testHistogram", "Gaussian test;x", 100, -3, 3);
+  for (int randomCounter = 0; randomCounter < 10000; ++randomCounter) testHistogram->Fill(gRandom->Gaus(0, 1));
+  TFile *outputFile = TFile::Open("testOutputs/test.root", "RECREATE");
+  tmROOTSaverUtils::saveSingleObject(testHistogram, "testCanvas", outputFile, "testOutputs/test.png", 1024, 768, 111111, "", "", false, false, false, -2.5, 2.5, 0, 0, 0, 0);
+  outputFile->Close();
   return 0;
 }

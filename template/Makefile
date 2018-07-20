@@ -8,10 +8,10 @@ vpath %.h include
 vpath % bin
 
 helloWorld: main.o
-	g++ -o bin/helloWorld obj/main.o -L$(TMCPPUTILS)/generalUtils/lib -ltmGeneralUtils `root-config --cflags --glibs`
+	g++ -o bin/helloWorld obj/main.o -L$(TMCPPUTILS)/generalUtils/lib -ltmGeneralUtils -L$(TMCPPUTILS)/ROOTUtils/lib -ltmROOTUtils `root-config --cflags --glibs`
 
 main.o: main.cpp main.h
-	g++ -c -Wall -Wextra -Werror -pedantic -std=c++11 -fPIC -O3 -o obj/main.o src/main.cpp -I$(TMCPPUTILS)/generalUtils/include `root-config --cflags --glibs`
+	g++ -c -Wall -Wextra -Werror -pedantic -std=c++11 -fPIC -O3 -o obj/main.o src/main.cpp -I$(TMCPPUTILS)/generalUtils/include -I$(TMCPPUTILS)/ROOTUtils/include `root-config --cflags --glibs`
 
 clean:
 	rm -rf bin/*
