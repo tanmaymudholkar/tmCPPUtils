@@ -34,30 +34,56 @@ TCanvas* tmROOTSaverUtils::saveObjects(TObjArray *objectArray, std::string canva
   //   std::cout << "ERROR: First object in array is null." << std::endl;
   //   std::exit(EXIT_FAILURE);
   // }
-  TH1* firstHistogram = (TH1*)(objectArray->At(0));
-  if (nullptr == firstHistogram) {
-    std::cout << "ERROR: Unable to cast first object in array to TH1." << std::endl;
-    std::exit(EXIT_FAILURE);
-  }
-  std::cout << "Drawing first object..." << std::endl;
-  printObjectInfo(firstHistogram);
-  if (customPlotOptions != "") firstHistogram->Draw(customPlotOptions.c_str());
-  else firstHistogram->Draw();
-  if (customXRangeHigh > customXRangeLow) firstHistogram->GetXaxis()->SetRangeUser(customXRangeLow, customXRangeHigh);
-  if (customYRangeHigh > customYRangeLow) firstHistogram->GetYaxis()->SetRangeUser(customYRangeLow, customYRangeHigh);
-  if (customZRangeHigh > customZRangeLow) firstHistogram->GetZaxis()->SetRangeUser(customZRangeLow, customZRangeHigh);
-  if (writeToFile) outputFile->WriteTObject(firstHistogram);
-  // Rest of the objects in the objarray need to be drawn with option "same"
-  for (int objectIndex = 1; objectIndex < nObjects; ++objectIndex) {
-    TH1* castObject = (TH1*)(objectArray->At(objectIndex));
-    if (nullptr == castObject) {
-      std::cout << "ERROR: Unable to cast object at index " << objectIndex << " to TH1" << std::endl;
+  TObject *firstObject = objectArray->At(0);
+  if (firstObject->InheritsFrom("TH1")) {
+    TH1* firstHistogram = (TH1*)(firstObject);
+    if (nullptr == firstHistogram) {
+      std::cout << "ERROR: Unable to cast first object in array to TH1." << std::endl;
       std::exit(EXIT_FAILURE);
     }
-    std::cout << "Drawing object at index: " << objectIndex << std::endl;
-    printObjectInfo(castObject);
-    castObject->Draw("same");
-    if (writeToFile) outputFile->WriteTObject(castObject);
+    std::cout << "Drawing first object..." << std::endl;
+    printObjectInfo(firstHistogram);
+    if (customPlotOptions != "") firstHistogram->Draw(customPlotOptions.c_str());
+    else firstHistogram->Draw();
+    if (customXRangeHigh > customXRangeLow) firstHistogram->GetXaxis()->SetRangeUser(customXRangeLow, customXRangeHigh);
+    if (customYRangeHigh > customYRangeLow) firstHistogram->GetYaxis()->SetRangeUser(customYRangeLow, customYRangeHigh);
+    if (customZRangeHigh > customZRangeLow) firstHistogram->GetZaxis()->SetRangeUser(customZRangeLow, customZRangeHigh);
+    if (writeToFile) outputFile->WriteTObject(firstHistogram);
+    // Rest of the objects in the objarray need to be drawn with option "same"
+    for (int objectIndex = 1; objectIndex < nObjects; ++objectIndex) {
+      TH1* castObject = (TH1*)(objectArray->At(objectIndex));
+      if (nullptr == castObject) {
+        std::cout << "ERROR: Unable to cast object at index " << objectIndex << " to TH1" << std::endl;
+        std::exit(EXIT_FAILURE);
+      }
+      std::cout << "Drawing object at index: " << objectIndex << std::endl;
+      printObjectInfo(castObject);
+      castObject->Draw("same");
+      if (writeToFile) outputFile->WriteTObject(castObject);
+    }
+  }
+  else if (std::string(firstObject->ClassName()) == "TGraph2D") {
+    if (nObjects > 1) {
+      std::cout << "ERROR: Only one TGraph2D supported at a time for now" << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+    TGraph2D* graph2D = (TGraph2D*)(firstObject);
+    if (nullptr == graph2D) {
+      std::cout << "ERROR: Unable to cast to TGraph2D." << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+    std::cout << "Drawing 2D graph..." << std::endl;
+    printObjectInfo(graph2D);
+    if (customPlotOptions != "") graph2D->Draw(customPlotOptions.c_str());
+    if (customXRangeHigh > customXRangeLow) graph2D->GetXaxis()->SetRangeUser(customXRangeLow, customXRangeHigh);
+    if (customYRangeHigh > customYRangeLow) graph2D->GetYaxis()->SetRangeUser(customYRangeLow, customYRangeHigh);
+    if (customZRangeHigh > customZRangeLow) graph2D->GetZaxis()->SetRangeUser(customZRangeLow, customZRangeHigh);
+    if (writeToFile) outputFile->WriteTObject(graph2D);
+  }
+  else {
+    std::cout << "ERROR: First TObject in array has unsupported type. Currently supported: all derived from TH1, and TGraph2D. Problematic object details: " << std::endl;
+    printObjectInfo(firstObject);
+    std::exit(EXIT_FAILURE);
   }
   if (!(outputDocumentName == "")) canvas->SaveAs(outputDocumentName.c_str());
   if (writeToFile) outputFile->WriteTObject(canvas);
