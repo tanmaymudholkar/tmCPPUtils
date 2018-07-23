@@ -51,15 +51,34 @@ TCanvas* tmROOTSaverUtils::saveObjects(TObjArray *objectArray, std::string canva
     if (writeToFile) outputFile->WriteTObject(firstHistogram);
     // Rest of the objects in the objarray need to be drawn with option "same"
     for (int objectIndex = 1; objectIndex < nObjects; ++objectIndex) {
-      TH1* castObject = (TH1*)(objectArray->At(objectIndex));
-      if (nullptr == castObject) {
-        std::cout << "ERROR: Unable to cast object at index " << objectIndex << " to TH1" << std::endl;
+      TObject *currentObject = objectArray->At(objectIndex);
+      if (currentObject->InheritsFrom("TH1")) {
+        TH1* castObject = (TH1*)(currentObject);
+        if (nullptr == castObject) {
+          std::cout << "ERROR: Unable to cast object at index " << objectIndex << " to TH1" << std::endl;
+          std::exit(EXIT_FAILURE);
+        }
+        std::cout << "Drawing object at index: " << objectIndex << std::endl;
+        printObjectInfo(castObject);
+        castObject->Draw("same");
+        if (writeToFile) outputFile->WriteTObject(castObject);
+      }
+      else if (std::string(currentObject->ClassName()) == "TLegend") {
+        TLegend *castObject = (TLegend*)(currentObject);
+        if (nullptr == castObject) {
+          std::cout << "ERROR: Unable to cast object at index " << objectIndex << " to TLegend" << std::endl;
+          std::exit(EXIT_FAILURE);
+        }
+        std::cout << "Drawing legend, object index: " << objectIndex << std::endl;
+        printObjectInfo(castObject);
+        castObject->Draw();
+        if (writeToFile) outputFile->WriteTObject(castObject);
+      }
+      else {
+        std::cout << "ERROR: The first object inherits from TH1, but object at index " << objectIndex << " does not, and is also not a TLegend. Object details:" << std::endl;
+        printObjectInfo(currentObject);
         std::exit(EXIT_FAILURE);
       }
-      std::cout << "Drawing object at index: " << objectIndex << std::endl;
-      printObjectInfo(castObject);
-      castObject->Draw("same");
-      if (writeToFile) outputFile->WriteTObject(castObject);
     }
   }
   else if (std::string(firstObject->ClassName()) == "TGraph2D") {
@@ -79,6 +98,11 @@ TCanvas* tmROOTSaverUtils::saveObjects(TObjArray *objectArray, std::string canva
     if (customYRangeHigh > customYRangeLow) graph2D->GetYaxis()->SetRangeUser(customYRangeLow, customYRangeHigh);
     if (customZRangeHigh > customZRangeLow) graph2D->GetZaxis()->SetRangeUser(customZRangeLow, customZRangeHigh);
     if (writeToFile) outputFile->WriteTObject(graph2D);
+  }
+  else if (std::string(firstObject->ClassName()) == "TLegend") {
+    std::cout << "ERROR: First TObject in array cannot be TLegend, please move it down the array. First object details: " << std::endl;
+    printObjectInfo(firstObject);
+    std::exit(EXIT_FAILURE);
   }
   else {
     std::cout << "ERROR: First TObject in array has unsupported type. Currently supported: all derived from TH1, and TGraph2D. Problematic object details: " << std::endl;
