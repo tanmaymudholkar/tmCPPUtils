@@ -6,6 +6,7 @@
 #include <sstream>
 #include <fstream>
 #include <regex>
+#include <vector>
 #include <map>
 
 struct argumentCharacteristicsStruct {
@@ -26,6 +27,8 @@ class tmArgumentParser {
   void addArgument(std::string argumentName, std::string defaultValueString, bool isRequired, std::string description);
 
   void setPassedStringValues(int argc, char** argv);
+
+  void printCallingSyntax();
 
   std::string getArgumentString(std::string argumentName);
 };
