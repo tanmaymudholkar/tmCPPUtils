@@ -8,10 +8,28 @@ int main(int argc, char* argv[]) {
   std::cout << "Constructing example argument parser..." << std::endl;
   tmArgumentParser argumentParser = tmArgumentParser("Template parser.");
   argumentParser.addArgument("arg", "defaultValue", false, "argument example.");
+  argumentParser.addArgument("argumentsList", "", false, "example of argument that is meant to be input as a list of strings with a colon separating them. Empty by default.");
+  argumentParser.addArgument("argumentsListOneElement", "test", false, "example of argument that is meant to be input as a list of strings with a colon separating them. Just one element by default.");
+  argumentParser.addArgument("argumentsListFourElements", "test1:test2:test3:test4", false, "example of argument that is meant to be input as a list of strings with a colon separating them. Four elements by default.");
   argumentParser.setPassedStringValues(argc, argv);
 
   std::string argValue = argumentParser.getArgumentString("arg");
   std::cout << "Argument \"arg\" is set to \"" << argValue << "\"" << std::endl;
+
+  std::vector<std::string> argumentsList = tmMiscUtils::getSplitString(argumentParser.getArgumentString("argumentsList"), ":");
+  std::cout << "Vector argumentsList is: {";
+  for (auto element: argumentsList) std::cout << element << ", ";
+  std::cout << "}" << std::endl;
+
+  std::vector<std::string> argumentsListOneElement = tmMiscUtils::getSplitString(argumentParser.getArgumentString("argumentsListOneElement"), ":");
+  std::cout << "Vector argumentsListOneElement is: {";
+  for (auto element: argumentsListOneElement) std::cout << element << ", ";
+  std::cout << "}" << std::endl;
+
+  std::vector<std::string> argumentsListFourElements = tmMiscUtils::getSplitString(argumentParser.getArgumentString("argumentsListFourElements"), ":");
+  std::cout << "Vector argumentsListFourElements is: {";
+  for (auto element: argumentsListFourElements) std::cout << element << ", ";
+  std::cout << "}" << std::endl;
 
   std::cout << "Constructing example progress bar without counter..." << std::endl;
   tmProgressBar* progressBarNoCounter = new tmProgressBar();
