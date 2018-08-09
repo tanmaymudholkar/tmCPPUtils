@@ -8,10 +8,6 @@ tmProgressBar::tmProgressBar(int counterMaxValue) {
   hasBeenInitialized_ = false;
 }
 
-tmProgressBar::~tmProgressBar() {
-  std::cout << std::endl;
-}
-
 void tmProgressBar::initialize() {
   startTime_ = std::chrono::system_clock::now();
   hasBeenInitialized_ = true;
@@ -66,4 +62,17 @@ std::string tmProgressBar::getBuffer(double fractionCompleted, int counterCurren
 void tmProgressBar::updateBar(double fractionCompleted, int counterCurrentValue) {
   std::cout << getBuffer(fractionCompleted, counterCurrentValue) << "\r";
   std::cout.flush();
+}
+
+void tmProgressBar::terminate() {
+  std::cout << std::endl;
+  if (hasBeenInitialized_) {
+    counterMaxValue_ = 0;
+    nDigits_counterMaxValue_ = 0;
+    hasBeenInitialized_ = false;
+  }
+}
+
+tmProgressBar::~tmProgressBar() {
+  terminate();
 }

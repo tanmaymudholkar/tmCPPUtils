@@ -25,6 +25,7 @@ class tmProgressBar {
   ~tmProgressBar();
   void initialize();
   void updateBar(double fractionCompleted, int counterCurrentValue = 0);
+  void terminate();
 };
 
 #endif
