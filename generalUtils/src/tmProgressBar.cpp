@@ -9,13 +9,16 @@ tmProgressBar::tmProgressBar(int counterMaxValue) {
 }
 
 void tmProgressBar::initialize() {
-  startTime_ = std::chrono::system_clock::now();
+  timeAtLastCheck_ = std::chrono::system_clock::now();
+  fractionCompletedAtLastCheck_ = 0.;
   hasBeenInitialized_ = true;
 }
 
-hoursMinutesSeconds getGuessTimeRemaining(double secondsElapsed, double fractionCompleted) {
+hoursMinutesSeconds tmProgressBar::getGuessTimeRemaining(double secondsSinceLastCheck, double fractionCompleted) {
+  double completionRate = (fractionCompleted - fractionCompletedAtLastCheck_)/secondsSinceLastCheck;
+  double fractionRemaining = 1.0 - fractionCompleted;
+  double timeRemainingEstimate_seconds = fractionRemaining/completionRate;
   hoursMinutesSeconds guess_timeRemaining;
-  double timeRemainingEstimate_seconds = secondsElapsed*(1-fractionCompleted)/fractionCompleted;
   guess_timeRemaining.hours = (int)(timeRemainingEstimate_seconds/3600);
   double timeRemainingEstimate_seconds_moduloHours = timeRemainingEstimate_seconds - 3600.0*guess_timeRemaining.hours;
   guess_timeRemaining.minutes = (int)(timeRemainingEstimate_seconds_moduloHours/60);
@@ -31,9 +34,9 @@ std::string tmProgressBar::getBuffer(double fractionCompleted, int counterCurren
   }
   if (fractionCompleted == 0) return "";
   std::chrono::system_clock::time_point currentTime = std::chrono::system_clock::now();
-  std::chrono::duration<double> timeElapsed = currentTime - startTime_;
-  double secondsElapsed = timeElapsed.count();
-  hoursMinutesSeconds guess_timeRemaining = getGuessTimeRemaining(secondsElapsed, fractionCompleted);
+  std::chrono::duration<double> timeElapsed = currentTime - timeAtLastCheck_;
+  double secondsSinceLastCheck = timeElapsed.count();
+  hoursMinutesSeconds guess_timeRemaining = getGuessTimeRemaining(secondsSinceLastCheck, fractionCompleted);
   double percentCompleted = 100*fractionCompleted;
   int approxPercentCompleted = (int)(0.5 + percentCompleted);
   std::stringstream outputBuffer;
@@ -56,6 +59,8 @@ std::string tmProgressBar::getBuffer(double fractionCompleted, int counterCurren
                << std::right << std::setw(4) << guess_timeRemaining.seconds << std::setw(4) << " s.";
 
   outputBuffer << std::setprecision(6);
+  fractionCompletedAtLastCheck_ = fractionCompleted;
+  timeAtLastCheck_ = currentTime;
   return outputBuffer.str();
 }
 

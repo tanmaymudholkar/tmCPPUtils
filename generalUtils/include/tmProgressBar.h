@@ -16,9 +16,10 @@ struct hoursMinutesSeconds {
 class tmProgressBar {
   int counterMaxValue_;
   int nDigits_counterMaxValue_;
+  double fractionCompletedAtLastCheck_;
   bool hasBeenInitialized_;
-  std::chrono::system_clock::time_point startTime_;
-  std::string getTimeRemaining(double secondsElapsed, double fractionCompleted);
+  std::chrono::system_clock::time_point timeAtLastCheck_;
+  hoursMinutesSeconds getGuessTimeRemaining(double secondsSinceLastCheck, double fractionCompleted);
   std::string getBuffer(double fractionCompleted, int counterCurrentValue = 0);
  public:
   tmProgressBar(int counterMaxValue = 0);
