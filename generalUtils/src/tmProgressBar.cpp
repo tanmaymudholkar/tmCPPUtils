@@ -1,7 +1,8 @@
 #include "../include/tmProgressBar.h"
 
-tmProgressBar::tmProgressBar(int counterMaxValue) {
+tmProgressBar::tmProgressBar(int counterMaxValue, bool allowNewlineInBuffer) {
   counterMaxValue_ = counterMaxValue;
+  allowNewlineInBuffer_ = allowNewlineInBuffer;
   std::stringstream temp;
   temp << counterMaxValue;
   nDigits_counterMaxValue_ = temp.str().size(); // lol
@@ -9,13 +10,16 @@ tmProgressBar::tmProgressBar(int counterMaxValue) {
 }
 
 void tmProgressBar::initialize() {
-  timeAtLastCheck_ = std::chrono::system_clock::now();
+  timeStarted_ = std::chrono::system_clock::now();
+  timeAtLastCheck_ = timeStarted_;
   fractionCompletedAtLastCheck_ = 0.;
   hasBeenInitialized_ = true;
 }
 
-hoursMinutesSeconds tmProgressBar::getGuessTimeRemaining(double secondsSinceLastCheck, double fractionCompleted) {
-  double completionRate = (fractionCompleted - fractionCompletedAtLastCheck_)/secondsSinceLastCheck;
+hoursMinutesSeconds tmProgressBar::getGuessTimeRemaining(double secondsSinceStart, double secondsSinceLastCheck, double fractionCompleted) {
+  double completionRate_overall = fractionCompleted/secondsSinceStart;
+  double completionRate_instantaneous = (fractionCompleted - fractionCompletedAtLastCheck_)/secondsSinceLastCheck;
+  double completionRate = WEIGHT_OVERALL*completionRate_overall + WEIGHT_INSTANTANEOUS*completionRate_instantaneous;
   double fractionRemaining = 1.0 - fractionCompleted;
   double timeRemainingEstimate_seconds = fractionRemaining/completionRate;
   hoursMinutesSeconds guess_timeRemaining;
@@ -34,9 +38,9 @@ std::string tmProgressBar::getBuffer(double fractionCompleted, int counterCurren
   }
   if (fractionCompleted == 0) return "";
   std::chrono::system_clock::time_point currentTime = std::chrono::system_clock::now();
-  std::chrono::duration<double> timeElapsed = currentTime - timeAtLastCheck_;
-  double secondsSinceLastCheck = timeElapsed.count();
-  hoursMinutesSeconds guess_timeRemaining = getGuessTimeRemaining(secondsSinceLastCheck, fractionCompleted);
+  std::chrono::duration<double> timeElapsedSinceStart = currentTime - timeStarted_;
+  std::chrono::duration<double> timeElapsedSinceLastCheck = currentTime - timeAtLastCheck_;
+  hoursMinutesSeconds guess_timeRemaining = getGuessTimeRemaining(timeElapsedSinceStart.count(), timeElapsedSinceLastCheck.count(), fractionCompleted);
   double percentCompleted = 100*fractionCompleted;
   int approxPercentCompleted = (int)(0.5 + percentCompleted);
   std::stringstream outputBuffer;
@@ -65,7 +69,9 @@ std::string tmProgressBar::getBuffer(double fractionCompleted, int counterCurren
 }
 
 void tmProgressBar::updateBar(double fractionCompleted, int counterCurrentValue) {
-  std::cout << getBuffer(fractionCompleted, counterCurrentValue) << "\r";
+  std::cout << getBuffer(fractionCompleted, counterCurrentValue);
+  if (allowNewlineInBuffer_) std::cout << std::endl;
+  else std::cout << "\r";
   std::cout.flush();
 }
 
