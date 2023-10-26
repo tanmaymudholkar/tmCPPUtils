@@ -27,8 +27,9 @@ class tmProgressBar {
   hoursMinutesSeconds getGuessTimeRemaining(double secondsSinceStart, double secondsSinceLastCheck, double fractionCompleted);
   std::string getBuffer(double fractionCompleted, int counterCurrentValue = 0);
  public:
-  tmProgressBar(int counterMaxValue = 0, bool allowNewlineInBuffer = true);
-  tmProgressBar(int counterMaxValue = 0) : tmProgressBar{counterMaxValue, true} { }
+  tmProgressBar(int counterMaxValue, bool allowNewlineInBuffer);
+  tmProgressBar(int counterMaxValue) : tmProgressBar{counterMaxValue, true} { }
+  tmProgressBar() : tmProgressBar{0, true} { }
   ~tmProgressBar();
   void initialize();
   void updateBar(double fractionCompleted, int counterCurrentValue = 0);
